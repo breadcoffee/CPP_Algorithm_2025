@@ -213,3 +213,26 @@ function heap_sort(arr[], n)
     heapify(arr, i - 1, 1)         // 1번 노드를 기준으로 heapify를 진행하여
                                    // max-heap 상태를 계속 유지해줍니다. 
 ```
+
+## 이진탐색
+- 이진 탐색(Binary Search)은 정렬된 배열에서 특정한 값을 효율적으로 찾는 탐색 알고리즘입니다.
+- 이 알고리즘의 기본 원리는 탐색 범위를 반으로 줄여가며 데이터를 찾는 것이며, 이 과정을 반복함으로써 탐색의 효율성을 극대화합니다.
+- 이진 탐색은 분할 정복(Divide and Conquer) 방식의 대표적인 예시로 볼 수 있습니다.
+- 이진 탐색의 시간 복잡도는 O(logN) 입니다.
+- 탐색속도가 매우 빠르지만 단점은 배열이 반드시 정렬되어있어야 한다.
+```C++
+function solution(arr, target)
+  set left = 0
+  set right = arr.size - 1
+  while left <= right
+    set mid = (left + right) / 2
+    if arr[mid] == target
+      return mid
+
+    if arr[mid] > target
+      right = mid - 1
+    else
+      left = mid + 1
+      
+  return -1
+```
