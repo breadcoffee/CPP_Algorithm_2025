@@ -326,7 +326,7 @@ def bfs(graph, start, visited):
 2. 최단 경로 알고리즘 (Shortest Path)
 두 지점 사이의 가장 효율적인 경로를 찾는 알고리즘입니다.
 
-- Dijkstra (다익스트라):
+- Dijkstra (다익스트라): 시작점이 1개고 가중치가 양수라면 사용
   - 음의 가중치가 없는 그래프에서 특정 시작점부터 다른 모든 정점까지의 최단 거리를 구합니다. (네비게이션의 기본 원리)
 ```python
 def dijkstra(graph, start, n):
@@ -349,7 +349,7 @@ def dijkstra(graph, start, n):
     return distances
 ```
 
-- Bellman-Ford (벨만-포드):
+- Bellman-Ford (벨만-포드): 가중치에 음수가 섞여 있다면 사용
   - 음의 가중치가 있는 그래프에서도 동작하며, '음의 사이클'이 있는지 확인할 수 있습니다.
 ```python
 def bellman_ford(start, n, edges):
@@ -365,7 +365,7 @@ def bellman_ford(start, n, edges):
     return dist  
 ```
 
-- Floyd-Warshall (플로이드-워셜):
+- Floyd-Warshall (플로이드-워셜): 모든 지점 간의 거리가 다 필요하다면 사용
   - 모든 정점 쌍 간의 최단 거리를 한 번에 다 구합니다. (거대한 2차원 배열 사용)
 ```python
 def floyd_warshall(n, graph): # graph는 2차원 인접 행렬
@@ -378,7 +378,7 @@ def floyd_warshall(n, graph): # graph는 2차원 인접 행렬
 3. 최소 신장 트리 (MST, Minimum Spanning Tree)
 그래프 내의 모든 정점을 가장 적은 비용으로 연결하는 '트리'를 찾는 알고리즘입니다.
 
-- Kruskal (크루스칼)
+- Kruskal (크루스칼) : 간선이 적거나 정렬이 쉽다면 사용
   - 간선들을 가중치 순으로 정렬한 뒤, 사이클을 만들지 않는 선에서 작은 가중치부터 선택합니다. (Union-Find 구조 활용)
 ```python
 def find_parent(parent, x):
@@ -401,7 +401,7 @@ for edge in edges:
         total_cost += cost  
 ```
 
-- Prim (프림)
+- Prim (프림) : 간선이 매우 많을 때 사용
   - 하나의 정점에서 시작해 연결된 간선 중 가장 저렴한 것을 선택하며 확장해 나갑니다.
 ```python
 def prim(start_node, n, adj):
