@@ -275,3 +275,187 @@ function solution(n)
   
     return dp[n]
 ```
+
+3. 0/1 Knapsack or Fractional Knapsack
+- 0/1 Knapsack
+  - 선택하지 않거나(0), 선택하거나(1) 두 가지 경우만 존재한다는 뜻입니다. 즉, 물건을 쪼갤 수 없는 상황
+  - 매순간 최선의 값을 구하는 그리디 알고리즘으로는 해결이 불가능
+  - 동적계획법으로 올바른 답을 구할 수 있다.
+- Fractional Knapsack
+  - 물건을 원하는 만큼 쪼개서(Fraction) 담을 수 있는 상황
+  - 현재 상황에서 최선이다 싶은 것을 계속 반복하는 알고리즘을 그리디 알고리즘, 욕심쟁이 기법이라 부른다.
+  - greedy 알고리즘이 Fractional Knapsack 문제에서는 실제 최적의 답을 가져와주게 된다.
+
+## 그래프
+그래프는 간선(Edge)과 노드(Node)의 집합으로 구성된 자료구조입니다.
+그래프는 특성에 따라 여러가지로 분류할 수 있는데, 대표적으로 방향의 존재 여부로 방향 그래프/무방향 그래프로 나눌 수 있습니다.
+그래프의 간선 위에 값이 적혀져 있는 경우도 있는데, 이때 우리는 이 값을 간선의 가중치라고 부릅니다.
+또한, 연결 관계에서 특정 노드와 연결된 이웃 노드의 수를 차수(Degree)라고 부릅니다.
+
+1. 그래프 탐색 (Graph Traversal)
+그래프의 모든 정점을 방문하는 가장 기초적인 방법입니다.
+
+- DFS (깊이 우선 탐색, Depth-First Search):
+  - 한 방향으로 갈 수 있는 데까지 깊게 가다가 막히면 되돌아오는 방식입니다.
+  - 특징: 스택(Stack)이나 재귀 함수를 사용합니다. 경로의 존재 여부를 파악할 때 유리합니다.
+```python
+def dfs(graph, v, visited):
+  visited[v] = True
+  print(v, end=' ')
+  for i in graph[v]:
+      if not visited[i]:
+          dfs(graph, i, visited)
+```
+
+- BFS (너비 우선 탐색, Breadth-First Search):
+  - 현재 정점에서 가까운 이웃들부터 먼저 방문하는 방식입니다.
+  - 특징: 큐(Queue)를 사용합니다. 가중치가 없는 그래프에서 최단 경로를 찾을 때 사용됩니다.
+```python
+def bfs(graph, start, visited):
+    queue = deque([start])
+    visited[start] = True
+    while queue:
+        v = queue.popleft()
+        print(v, end=' ')
+        for i in graph[v]:
+            if not visited[i]:
+                queue.append(i)
+                visited[i] = True
+```
+
+2. 최단 경로 알고리즘 (Shortest Path)
+두 지점 사이의 가장 효율적인 경로를 찾는 알고리즘입니다.
+
+- Dijkstra (다익스트라):
+  - 음의 가중치가 없는 그래프에서 특정 시작점부터 다른 모든 정점까지의 최단 거리를 구합니다. (네비게이션의 기본 원리)
+```python
+def dijkstra(graph, start, n):
+    distances = [float('inf')] * (n + 1)
+    distances[start] = 0
+    queue = []
+    heapq.heappush(queue, [distances[start], start])
+
+    while queue:
+        current_distance, current_destination = heapq.heappop(queue)
+
+        if distances[current_destination] < current_distance:
+            continue
+        
+        for new_destination, weight in graph[current_destination]:
+            distance = current_distance + weight
+            if distance < distances[new_destination]:
+                distances[new_destination] = distance
+                heapq.heappush(queue, [distance, new_destination])
+    return distances
+```
+
+- Bellman-Ford (벨만-포드):
+  - 음의 가중치가 있는 그래프에서도 동작하며, '음의 사이클'이 있는지 확인할 수 있습니다.
+```python
+def bellman_ford(start, n, edges):
+    dist = [float('inf')] * (n + 1)
+    dist[start] = 0
+    
+    for i in range(n): # n번 반복
+        for u, v, w in edges: # 모든 간선 확인
+            if dist[u] != float('inf') and dist[v] > dist[u] + w:
+                dist[v] = dist[u] + w
+                if i == n - 1: # n번째에도 갱신되면 음수 사이클 존재
+                    return "Negative Cycle Detected"
+    return dist  
+```
+
+- Floyd-Warshall (플로이드-워셜):
+  - 모든 정점 쌍 간의 최단 거리를 한 번에 다 구합니다. (거대한 2차원 배열 사용)
+```python
+def floyd_warshall(n, graph): # graph는 2차원 인접 행렬
+    for k in range(1, n + 1):     # 거쳐가는 노드
+        for a in range(1, n + 1): # 출발 노드
+            for b in range(1, n + 1): # 도착 노드
+                graph[a][b] = min(graph[a][b], graph[a][k] + graph[k][b])  
+```
+
+3. 최소 신장 트리 (MST, Minimum Spanning Tree)
+그래프 내의 모든 정점을 가장 적은 비용으로 연결하는 '트리'를 찾는 알고리즘입니다.
+
+- Kruskal (크루스칼)
+  - 간선들을 가중치 순으로 정렬한 뒤, 사이클을 만들지 않는 선에서 작은 가중치부터 선택합니다. (Union-Find 구조 활용)
+```python
+def find_parent(parent, x):
+    if parent[x] != x:
+        parent[x] = find_parent(parent, parent[x])
+    return parent[x]
+
+def union_parent(parent, a, b):
+    a = find_parent(parent, a)
+    b = find_parent(parent, b)
+    if a < b: parent[b] = a
+    else: parent[a] = b
+
+# Kruskal 메인 로직
+edges.sort() # 가중치 순 정렬
+for edge in edges:
+    cost, a, b = edge
+    if find_parent(parent, a) != find_parent(parent, b):
+        union_parent(parent, a, b)
+        total_cost += cost  
+```
+
+- Prim (프림)
+  - 하나의 정점에서 시작해 연결된 간선 중 가장 저렴한 것을 선택하며 확장해 나갑니다.
+```python
+def prim(start_node, n, adj):
+    visited = [False] * (n + 1)
+    pq = [(0, start_node)] # (가중치, 노드)
+    total_weight = 0
+    
+    while pq:
+        weight, u = heapq.heappop(pq)
+        if visited[u]: continue
+        
+        visited[u] = True
+        total_weight += weight
+        
+        for v, w in adj[u]:
+            if not visited[v]:
+                heapq.heappush(pq, (w, v))
+    return total_weight  
+```
+
+4. 기타 중요 알고리즘
+- 위상 정렬 (Topological Sort)
+  - 방향 그래프에서 '순서'가 정해져 있을 때(예: 선수 과목 수강 순서), 그 순서를 거스르지 않게 나열하는 방법입니다.
+```python
+def topological_sort(n, indegree, graph):
+    result = []
+    q = deque()
+
+    for i in range(1, n + 1):
+        if indegree[i] == 0:
+            q.append(i)
+
+    while q:
+        now = q.popleft()
+        result.append(now)
+        for i in graph[now]:
+            indegree[i] -= 1
+            if indegree[i] == 0:
+                q.append(i)
+    return result  
+```
+
+- Union-Find (서로소 집합)
+  - 여러 노드가 같은 그룹에 속해 있는지 확인하고 합치는 알고리즘으로, 크루스칼 알고리즘의 핵심 도구입니다.
+```python
+def find_parent(parent, x):
+    # 경로 압축: 루트 노드를 바로 부모로 설정
+    if parent[x] != x:
+        parent[x] = find_parent(parent, parent[x])
+    return parent[x]
+
+def union_parent(parent, a, b):
+    root_a = find_parent(parent, a)
+    root_b = find_parent(parent, b)
+    if root_a != root_b:
+        parent[root_b] = root_a # 보통 작은 번호를 부모로 합침  
+```
