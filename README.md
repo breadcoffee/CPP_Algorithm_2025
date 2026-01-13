@@ -329,6 +329,7 @@ def bfs(graph, start, visited):
 - Dijkstra (다익스트라): 시작점이 1개고 가중치가 양수라면 사용
   - 음의 가중치가 없는 그래프에서 특정 시작점부터 다른 모든 정점까지의 최단 거리를 구합니다. (네비게이션의 기본 원리)
 ```python
+# Python
 def dijkstra(graph, start, n):
     distances = [float('inf')] * (n + 1)
     distances[start] = 0
@@ -347,6 +348,25 @@ def dijkstra(graph, start, n):
                 distances[new_destination] = distance
                 heapq.heappush(queue, [distance, new_destination])
     return distances
+```
+```C++
+// C++
+function dijkstra(graph, source)              // 그래프와 시작점 정보가 주어집니다.
+    set Q = Queue()                           // 우선순위 큐를 만들어줍니다.
+
+    for each vertex in graph                  // 그래프에 있는 모든 노드들에 대해
+        set dist[v] = INF                     // 초기값을 전부 아주 큰 값으로 설정해주고 
+        Q.push(v)                             // 우선순위큐에 각 노드를 넣어줍니다.
+
+    set dist[source] = 0                      // 시작점에 대해서만 dist 값을 0으로 초기화해줍니다.
+    while Q is not empty                      // 우선순위 큐가 비어있지 않을 때까지 반복합니다.
+        set u = vertex in Q with min dist     // 우선순위 큐에서 dist값이 가장 작은 노드를 선택합니다.
+        Q.remove(u)                           // 우선순위 큐에서 해당 노드를 제거해줍니다.
+
+        for each neighbor v of u              // u번 노드와 연결된 노드들을 전부 살펴보면서
+            set alt = dist[u] + length(u, v)  // 현재 dist값에 간선 가중치를 더한 값을 계산하여
+            if alt < dist[v]                  // 기존 dist값보다 더 alt값이 작다면
+                set dist[v] = alt             // dist값을 갱신해줍니다.
 ```
 
 - Bellman-Ford (벨만-포드): 가중치에 음수가 섞여 있다면 사용
@@ -368,15 +388,29 @@ def bellman_ford(start, n, edges):
 - Floyd-Warshall (플로이드-워셜): 모든 지점 간의 거리가 다 필요하다면 사용
   - 모든 정점 쌍 간의 최단 거리를 한 번에 다 구합니다. (거대한 2차원 배열 사용)
 ```python
+# Python
 def floyd_warshall(n, graph): # graph는 2차원 인접 행렬
     for k in range(1, n + 1):     # 거쳐가는 노드
         for a in range(1, n + 1): # 출발 노드
             for b in range(1, n + 1): # 도착 노드
                 graph[a][b] = min(graph[a][b], graph[a][k] + graph[k][b])  
 ```
+```C++
+// C++
+function floyd(graph)
+    set dist = |V| * |V| array initialized to INF  // 처음 dist 배열을 아주 큰 값인 INF로 초기화합니다.
+    for each edge(u, v)                            // 주어진 그래프의 모든 간선에 대해
+        dist[u][v] = length(u, v)                  // 각 간선의 가중치를 dist 배열에 적어줍니다.
+    for k = 1 ... |V|                              // 확실하게 거쳐갈 정점을 1번부터 V번까지 순서대로 정의합니다.
+        for i = 1 ... |V|                          // 고정된 k에 대해 모든 쌍 (i, j)를 살펴봅니다.
+            for j = 1 ... |V|
+                if dist[i][j] > dist[i][k] + dist[k][j]     // i에서 j로 가는 거리가 k를 경유해 가는 것이 더 좋다면
+                    dist[i][j] = dist[i][k] + dist[k][j]    // dist[i][j]값을 갱신해줍니다.
+    return dist
+```
 
 3. 최소 신장 트리 (MST, Minimum Spanning Tree)
-그래프 내의 모든 정점을 가장 적은 비용으로 연결하는 '트리'를 찾는 알고리즘입니다.
+그래프 내의 모든 정점을 가장 적은 비용으로 연결하는 '트리'를 찾는 알고리즘입니다. (그래프에서 정점이 N개이고 간선이 N-1개이면 트리이다.)
 
 - Kruskal (크루스칼) : 간선이 적거나 정렬이 쉽다면 사용
   - 간선들을 가중치 순으로 정렬한 뒤, 사이클을 만들지 않는 선에서 작은 가중치부터 선택합니다. (Union-Find 구조 활용)
@@ -400,6 +434,21 @@ for edge in edges:
         union_parent(parent, a, b)
         total_cost += cost  
 ```
+```C++
+// C++
+function kruskal()
+    mst = []                       // mst를 담을 배열입니다.
+    sort edge[] by length          // 간선을 가중치 기준으로 오름차순 정렬합니다.
+    uf = uf_init(|V|)              // uf 배열을 노드의 수 |V|만큼 초기화합니다.
+
+    for E in edge[]                // 각각의 간선에 대해 
+        u, v = E                   // 간선을 이루고 있는 두 노드 u, v를 보며
+        if find(u) != find(v)      // u, v의 루트 노드가 다른 경우에만
+            mst.push(E)            // mst에 해당 간선을 넣어주고
+            union(u, v)            // u, v를 같은 루트 노드를 갖도록 만들어줍니다.
+    
+    return mst
+```
 
 - Prim (프림) : 간선이 매우 많을 때 사용
   - 하나의 정점에서 시작해 연결된 간선 중 가장 저렴한 것을 선택하며 확장해 나갑니다.
@@ -420,6 +469,25 @@ def prim(start_node, n, adj):
             if not visited[v]:
                 heapq.heappush(pq, (w, v))
     return total_weight  
+```
+```C++
+// C++
+function prim(graph)                          // 그래프와 시작점 정보가 주어집니다.
+    set Q = Queue()                           // 우선순위 큐를 만들어줍니다.
+
+    for each vertex in graph                  // 그래프에 있는 모든 노드들에 대해
+        set dist[v] = INF                     // 초기값을 전부 아주 큰 값으로 설정해주고 
+        Q.push(v)                             // 우선순위큐에 각 노드를 넣어줍니다.
+    set source = |V|                          // 시작점을 임의로 마지막 노드로 설정합니다.
+    set dist[source] = 0                      // 시작점 대해서만 dist 값을 0으로 초기화해줍니다.
+    while Q is not empty                      // 우선순위 큐가 비어있지 않을 때까지 반복합니다.
+        set u = vertex in Q with min dist     // 우선순위 큐에서 dist값이 가장 작은 노드를 선택합니다.
+        Q.remove(u)                           // 우선순위 큐에서 해당 노드를 제거해줍니다.
+
+        for each neighbor v of u              // u번 노드와 연결된 노드들을 전부 살펴보면서
+            set alt = length(u, v)            // 간선 가중치를 살펴봅니다.
+            if alt < dist[v]                  // 기존 dist값보다 더 alt값이 작다면
+                set dist[v] = alt             // dist값을 갱신해줍니다.
 ```
 
 4. 기타 중요 알고리즘
@@ -447,6 +515,7 @@ def topological_sort(n, indegree, graph):
 - Union-Find (서로소 집합)
   - 여러 노드가 같은 그룹에 속해 있는지 확인하고 합치는 알고리즘으로, 크루스칼 알고리즘의 핵심 도구입니다.
 ```python
+# Python
 def find_parent(parent, x):
     # 경로 압축: 루트 노드를 바로 부모로 설정
     if parent[x] != x:
@@ -458,4 +527,23 @@ def union_parent(parent, a, b):
     root_b = find_parent(parent, b)
     if root_a != root_b:
         parent[root_b] = root_a # 보통 작은 번호를 부모로 합침  
+```
+```C++
+// C++
+function init(size)
+  set uf = [0] with size
+  for i = 1 ... size
+    uf[i] = i
+  return uf
+
+function find(x)
+  if uf[x] == x                 // x가 루트 노드라면
+    return x                    // x 값을 반환합니다.
+  set root_node = find(uf[x])   // x가 루트 노드가 아니라면, x의 부모인 uf[x]에서 더 탐색을 진행합니다.
+  uf[x] = root_node             // 노드 x에 부모를 루트 노드로 설정해줍니다.
+  return root_node              // 찾아낸 루트 노드를 반환합니다.
+  
+function union(x, y)
+  set X = find(x), Y = find(y)
+  uf[X] = Y
 ```
